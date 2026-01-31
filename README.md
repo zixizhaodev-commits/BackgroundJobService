@@ -51,12 +51,11 @@ This service accepts a job request, returns a `jobId` immediately, and executes 
 
 ### Create Job
 
-```http
-POST /api/jobs
+**POST** `/api/jobs`
 
+#### Request
 
-Request
-
+```json
 {
   "type": "Import",
   "payload": {
@@ -65,21 +64,24 @@ Request
   },
   "maxAttempts": 3
 }
+```
 
+#### Response
 
-Response
-
+```json
 {
   "jobId": "uuid",
   "statusUrl": "/api/jobs/uuid"
 }
+```
 
-Get Job Status
-GET /api/jobs/{id}
+### Get Job Status
 
+**GET** `/api/jobs/{id}`
 
-Example Response
+#### Example Response
 
+```json
 {
   "id": "uuid",
   "type": "Import",
@@ -88,13 +90,15 @@ Example Response
   "maxAttempts": 3,
   "lastError": "Simulated import failure based on payload."
 }
+```
 
-Get Execution Logs
-GET /api/jobs/{id}/logs
+### Get Execution Logs
 
+**GET** `/api/jobs/{id}/logs`
 
-Example Response
+#### Example Response
 
+```json
 [
   {
     "attemptNumber": 1,
@@ -103,44 +107,47 @@ Example Response
     "durationMs": 3012
   }
 ]
+```
 
-🧠 Design Notes
+## 🧠 Design Notes
 
-Job execution is decoupled from HTTP requests
+- Job execution is decoupled from HTTP requests
+- Retry behavior is handled centrally using **Polly**
+- Job handlers are extensible via `IJobHandler`
+- Execution logs provide full observability
+- Queue can be replaced by **Redis / RabbitMQ** later
 
-Retry behavior is handled centrally using Polly
+---
 
-Job handlers are extensible via IJobHandler
+## 🛠 Tech Stack
 
-Execution logs provide full observability
+- ASP.NET Core (.NET 8)
+- EF Core + SQLite
+- Serilog
+- Polly
+- Swagger / OpenAPI
 
-Queue can be replaced by Redis / RabbitMQ later
 
-🛠 Tech Stack
+## 🚀 Local Development
 
-ASP.NET Core (.NET 8)
-
-EF Core + SQLite
-
-Serilog
-
-Polly
-
-Swagger / OpenAPI
-
-🚀 Local Development
+```bash
 dotnet restore
 dotnet run
+```
 
 
-Swagger UI:
+### Swagger UI
 
 http://localhost:5042/swagger
 
-👤 Author
+---
+
+## 👤 Author
 
 Zixi Zhao
 
-📄 License
+---
+
+## 📄 License
 
 MIT
