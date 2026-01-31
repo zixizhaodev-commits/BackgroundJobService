@@ -11,7 +11,7 @@ A lightweight background job processing service that demonstrates how to:
 
 ---
 
-## System Architecture
+## 🧱 System Architecture
 
 ```mermaid
 flowchart TB
@@ -34,6 +34,8 @@ flowchart TB
     handlers -->|"Persist results"| db
     worker -->|"Write attempt logs"| logs
 ```
+
+---
 
 ## 🤔 Why This Exists
 
@@ -75,6 +77,8 @@ This service accepts a job request, returns a `jobId` immediately, and executes 
 }
 ```
 
+---
+
 ### Get Job Status
 
 **GET** `/api/jobs/{id}`
@@ -91,6 +95,8 @@ This service accepts a job request, returns a `jobId` immediately, and executes 
   "lastError": "Simulated import failure based on payload."
 }
 ```
+
+---
 
 ### Get Execution Logs
 
@@ -109,13 +115,15 @@ This service accepts a job request, returns a `jobId` immediately, and executes 
 ]
 ```
 
+---
+
 ## 🧠 Design Notes
 
-- Job execution is decoupled from HTTP requests
-- Retry behavior is handled centrally using **Polly**
+- Job execution is fully decoupled from HTTP requests
+- Retry behavior is centralized using **Polly**
 - Job handlers are extensible via `IJobHandler`
-- Execution logs provide full observability
-- Queue can be replaced by **Redis / RabbitMQ** later
+- Execution logs provide full observability and audit trail
+- Queue can be replaced by **Redis / RabbitMQ** with minimal changes
 
 ---
 
@@ -127,6 +135,7 @@ This service accepts a job request, returns a `jobId` immediately, and executes 
 - Polly
 - Swagger / OpenAPI
 
+---
 
 ## 🚀 Local Development
 
@@ -135,10 +144,9 @@ dotnet restore
 dotnet run
 ```
 
-
 ### Swagger UI
 
-http://localhost:5042/swagger
+**Swagger:** http://localhost:5042/swagger
 
 ---
 
