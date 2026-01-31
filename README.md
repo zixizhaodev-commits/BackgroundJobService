@@ -13,7 +13,7 @@ in a small but **production-shaped** backend service.
 
 - 🚀 Non-blocking job submission (HTTP requests return immediately)
 - 🧵 Background job processing using `BackgroundService`
-- 📦 Persistent job lifecycle tracking (Queued → Running → Succeeded / Failed)
+- 📦 Persistent job lifecycle tracking (`Queued → Running → Succeeded / Failed`)
 - 🔁 Automatic retries with exponential backoff (Polly)
 - 🧾 Per-attempt execution audit trail
 - 📊 Structured logging with Serilog
