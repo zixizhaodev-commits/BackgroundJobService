@@ -2,24 +2,25 @@
 
 ```mermaid
 flowchart TB
-    client[Client<br/>(Browser / cURL / Frontend App)]
-    api[ASP.NET Core API<br/>BackgroundJobService]
-    queue[InMemory Queue<br/>(Channel&lt;Guid&gt;)]
-    worker[JobProcessorWorker<br/>(BackgroundService)]
-    handlers[Job Handlers<br/>ImportJobHandler / ReportJobHandler]
-    db[(SQLite DB<br/>EF Core)]
-    logs[(JobExecutionLogs<br/>Audit Trail)]
+    client["Client (Browser / cURL / Frontend App)"]
+    api["ASP.NET Core API - BackgroundJobService"]
+    queue["InMemory Queue (Channel<Guid>)"]
+    worker["JobProcessorWorker (BackgroundService)"]
+    handlers["Job Handlers: ImportJobHandler / ReportJobHandler"]
+    db["SQLite Database (EF Core)"]
+    logs["JobExecutionLogs (Audit Trail)"]
 
-    client -->|HTTP POST /api/jobs| api
-    client -->|HTTP GET /api/jobs/{id}| api
-    client -->|HTTP GET /api/jobs/{id}/logs| api
+    client -->|POST /api/jobs| api
+    client -->|GET /api/jobs/{id}| api
+    client -->|GET /api/jobs/{id}/logs| api
 
     api -->|Enqueue(jobId)| queue
     queue -->|Dequeue(jobId)| worker
-    worker -->|ExecuteAsync(job)| handlers
+    worker -->|Execute job| handlers
     worker -->|Update job state| db
     handlers -->|Persist results| db
-    worker -->|Write per-attempt logs| logs
+    worker -->|Write attempt logs| logs
+
 
 # Background Job & Task Processing Service (ASP.NET Core)
 
