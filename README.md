@@ -1,3 +1,53 @@
+┌──────────────────────┐
+│        Client        │
+│  (Browser / cURL /   │
+│   Frontend App)      │
+└──────────┬───────────┘
+           │ HTTP POST /api/jobs
+           │
+┌──────────▼───────────┐
+│     JobsController   │
+│  - Validate request  │
+│  - Persist job       │
+│  - Enqueue job ID    │
+└──────────┬───────────┘
+           │
+           │ Enqueue(jobId)
+           ▼
+┌──────────────────────┐
+│     InMemory Queue   │
+│   (Channel<Guid>)    │
+└──────────┬───────────┘
+           │
+           │ Dequeue(jobId)
+           ▼
+┌──────────────────────┐
+│  JobProcessorWorker  │  (BackgroundService)
+│  - Load job from DB  │
+│  - Select handler    │
+│  - Apply retry policy│
+│  - Update job state  │
+└──────────┬───────────┘
+           │
+           │ ExecuteAsync(job)
+           ▼
+┌──────────────────────┐
+│     Job Handlers     │
+│  - ImportJobHandler │
+│  - ReportJobHandler │
+│                      │
+│  (Business logic)    │
+└──────────┬───────────┘
+           │
+           │ Persist execution result
+           ▼
+┌──────────────────────┐
+│   SQLite (EF Core)   │
+│  - Jobs table        │
+│  - JobExecutionLogs  │
+└──────────────────────┘
+
+
 # Background Job & Task Processing Service (ASP.NET Core)
 
 A lightweight background job processing service that demonstrates how to:
