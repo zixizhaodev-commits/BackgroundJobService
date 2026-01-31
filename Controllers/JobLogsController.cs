@@ -1,5 +1,6 @@
 using BackgroundJobService.Data;
 using BackgroundJobService.Jobs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace BackgroundJobService.Controllers;
 
 [ApiController]
 [Route("api/jobs/{jobId:guid}/logs")]
+[Produces("application/json")]
 public class JobLogsController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -17,7 +19,6 @@ public class JobLogsController : ControllerBase
     }
 
     [HttpGet]
-    [Produces("application/json")]
     [ProducesResponseType(typeof(List<JobExecutionLog>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<JobExecutionLog>>> GetLogs(Guid jobId, CancellationToken ct)
     {

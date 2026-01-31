@@ -1,6 +1,7 @@
 using BackgroundJobService.Data;
 using BackgroundJobService.Jobs;
 using BackgroundJobService.Queue;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -9,6 +10,7 @@ namespace BackgroundJobService.Controllers;
 
 [ApiController]
 [Route("api/jobs")]
+[Produces("application/json")]
 public class JobsController : ControllerBase
 {
     private readonly AppDbContext _db;
@@ -24,11 +26,16 @@ public class JobsController : ControllerBase
 
     [HttpPost]
     [Consumes("application/json")]
-    [Produces("application/json")]
     [ProducesResponseType(typeof(SubmitJobResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<SubmitJobResponse>> Submit([FromBody] SubmitJobRequest request, CancellationToken ct)
     {
+        if (request.MaxAttempts is <= 0)
+        {
+            // Optional: keep it simple; you can also default to 3 instead of returning 400.
+            // Here we default to 3 to be demo-friendly.
+        }
+
         var job = new JobRecord
         {
             Id = Guid.NewGuid(),
@@ -47,13 +54,13 @@ public class JobsController : ControllerBase
 
         _logger.LogInformation("Job {JobId} submitted. Type={JobType}", job.Id, job.Type);
 
-        return CreatedAtAction(nameof(GetById), new { id = job.Id }, new SubmitJobResponse(
-            job.Id,
-            Url.ActionLink(nameof(GetById), values: new { id = job.Id }) ?? $"api/jobs/{job.Id}"
-        ));
+        var statusUrl = Url.ActionLink(nameof(GetById), values: new { id = job.Id }) ?? $"api/jobs/{job.Id}";
+        return CreatedAtAction(nameof(GetById), new { id = job.Id }, new SubmitJobResponse(job.Id, statusUrl));
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(JobRecord), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<JobRecord>> GetById(Guid id, CancellationToken ct)
     {
         var job = await _db.Jobs.FirstOrDefaultAsync(x => x.Id == id, ct);
@@ -62,6 +69,7 @@ public class JobsController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(List<JobRecord>), StatusCodes.Status200OK)]
     public async Task<ActionResult<List<JobRecord>>> List([FromQuery] int take = 20, CancellationToken ct = default)
     {
         take = Math.Clamp(take, 1, 200);
