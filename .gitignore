@@ -1,0 +1,22 @@
+# Build output
+bin/
+obj/
+
+# VS / VS Code
+.vscode/
+.vs/
+*.user
+*.suo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs / local runtime artifacts
+logs/
+*.log
+
+# Local SQLite database (do not commit)
+jobs.db
+jobs.db-shm
+jobs.db-wal
