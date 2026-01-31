@@ -1,47 +1,35 @@
-# 🛠 Background Job & Task Processing Service
+# Background Job & Task Processing Service (ASP.NET Core)
 
-A lightweight **background job processing service** for handling long-running tasks
-(such as imports and report generation) **without blocking HTTP requests**.
+A lightweight background job processing service that demonstrates how to:
 
-This project demonstrates **asynchronous job execution**, **persistent job state tracking**,
-**retry policies with exponential backoff**, and **execution-level observability** —
-in a small but **production-shaped** backend service.
+- Offload long-running work (imports / report generation) from HTTP requests
+- Track job lifecycle and execution attempts in persistent storage
+- Increase reliability with retry policies (exponential backoff)
+- Improve observability with structured logs and per-attempt audit records
 
----
-
-## ✨ Features
-
-- 🚀 Non-blocking job submission (HTTP requests return immediately)
-- 🧵 Background job processing using `BackgroundService`
-- 📦 Persistent job lifecycle tracking (`Queued → Running → Succeeded / Failed`)
-- 🔁 Automatic retries with exponential backoff (Polly)
-- 🧾 Per-attempt execution audit trail
-- 📊 Structured logging with Serilog
-- 🔗 RESTful API with Swagger UI
-- ⚙️ SQLite + Entity Framework Core
-- 🧩 Clean separation of API, queue, worker, and handlers
+> This project is intentionally small but **production-shaped**: clear boundaries, persistence, retries, and debuggable execution history.
 
 ---
 
-## 🧱 System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TB
-    Client["Client<br/>(Browser / cURL / Frontend App)"]
-    API["ASP.NET Core API<br/>BackgroundJobService"]
-    Queue["In-Memory Queue<br/>(Channel<Guid>)"]
-    Worker["JobProcessorWorker<br/>(BackgroundService)"]
-    Handlers["Job Handlers<br/>(Import / Report)"]
-    DB["SQLite Database<br/>(EF Core)"]
-    Logs["JobExecutionLogs<br/>(Audit Trail)"]
+    client["Client (Browser / cURL / Frontend App)"]
+    api["ASP.NET Core API (BackgroundJobService)"]
+    queue["InMemory Queue (Channel)"]
+    worker["JobProcessorWorker (BackgroundService)"]
+    handlers["Job Handlers (Import / Report)"]
+    db["SQLite Database (EF Core)"]
+    logs["JobExecutionLogs (Audit Trail)"]
 
-    Client -->|POST /api/jobs| API
-    Client -->|GET /api/jobs/{id}| API
-    Client -->|GET /api/jobs/{id}/logs| API
+    client -->|"POST /api/jobs"| api
+    client -->|"GET /api/jobs/{id}"| api
+    client -->|"GET /api/jobs/{id}/logs"| api
 
-    API -->|Enqueue jobId| Queue
-    Queue -->|Dequeue jobId| Worker
-    Worker -->|Execute job| Handlers
-    Worker -->|Update job state| DB
-    Handlers -->|Persist results| DB
-    Worker -->|Write attempt logs| Logs
+    api -->|"Enqueue jobId"| queue
+    queue -->|"Dequeue jobId"| worker
+    worker -->|"Execute job"| handlers
+    worker -->|"Update job state"| db
+    handlers -->|"Persist results"| db
+    worker -->|"Write attempt logs"| logs
